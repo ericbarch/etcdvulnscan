@@ -52,7 +52,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # break down our IP prefix into individual IPs
 ip_range = IPNetwork(sys.argv[1])
-# holds our list of IPs (strings) to scan
+# holds our list of IPs to scan
 ips = list(ip_range)
 
 
