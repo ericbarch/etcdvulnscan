@@ -1,6 +1,7 @@
 # etcd vulnerability scanner
 # v1 (2015-Jul-20)
 # by eric barch (ericbarch.com)
+# REQUIREMENTS: netaddr
 
 
 # imports
@@ -11,6 +12,13 @@ import time
 import json
 import signal
 import sys
+from netaddr import IPNetwork
+
+
+# check if the script is being invoked with the IP prefix or not
+if len(sys.argv) != 2:
+    print 'EXAMPLE USAGE: python scan.py 45.55.0.0/16'
+    sys.exit(0)
 
 
 # define our database to store scanned hosts
@@ -42,8 +50,10 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
+# break down our IP prefix into individual IPs
+ip_range = IPNetwork(sys.argv[1])
 # holds our list of IPs (strings) to scan
-ips = []
+ips = list(ip_range)
 
 
 # etcd 0.4.8 has a different version string, we normalize here
@@ -84,7 +94,10 @@ def request_etcd_version(ip):
 
 
 # scan ip range
-for ip in ips:
+for ip_addr in ips:
+    # convert IPNetwork object into string representation
+    ip = str(ip_addr)
+
     # check if we've scanned this IP before, skip if so
     cursor.execute('SELECT rowid FROM etcdscan WHERE ip = ?', (ip, ))
     data = cursor.fetchall()
