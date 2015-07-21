@@ -44,7 +44,7 @@ def signal_handler(signal, frame):
     # commit db changes and close
     db.commit()
     db.close()
-    sys.exit(0)
+    sys.exit(1)
 
 # register the sigint handler
 signal.signal(signal.SIGINT, signal_handler)

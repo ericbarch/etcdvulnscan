@@ -22,3 +22,6 @@ $RECYCLE.BIN/
 
 # sqlite db
 db.sqlite
+
+# csv output
+etcd_hosts.csv
