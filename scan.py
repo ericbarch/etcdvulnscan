@@ -50,10 +50,18 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-# break down our IP prefix into individual IPs
-ip_range = IPNetwork(sys.argv[1])
-# holds our list of IPs to scan
-ips = list(ip_range)
+# hold on to all of the IPs we need to scan
+ips = []
+
+# split the user's input on commas
+ip_ranges = sys.argv[1].split(',')
+
+# iterate over all of the specified IP prefixes
+for ip_range in ip_ranges:
+    # break down our IP prefix into individual IPs
+    ip_range = IPNetwork(ip_range)
+    # add the IPs from this prefix to our ip scanning list
+    ips = ips + list(ip_range)
 
 
 # etcd 0.4.8 has a different version string, we normalize here
