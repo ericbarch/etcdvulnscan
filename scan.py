@@ -63,6 +63,10 @@ for ip_range in ip_ranges:
     # add the IPs from this prefix to our ip scanning list
     ips = ips + list(ip_range)
 
+# keep track of how many hosts we have and how many we have scanned
+ip_count = len(ips)
+ips_scanned = 0
+
 
 # etcd 0.4.8 has a different version string, we normalize here
 def filter_for_etcd_048(resp):
@@ -106,6 +110,8 @@ for ip_addr in ips:
     # convert IPNetwork object into string representation
     ip = str(ip_addr)
 
+    ips_scanned += 1
+
     # check if we've scanned this IP before, skip if so
     cursor.execute('SELECT rowid FROM etcdscan WHERE ip = ?', (ip, ))
     data = cursor.fetchall()
@@ -116,7 +122,7 @@ for ip_addr in ips:
         if not resp == None:
             print resp + ' found'
         else:
-            print 'host did not respond'
+            print 'host did not respond (' + "{0:.2f}".format((float(ips_scanned)/float(ip_count)) * 100) + '%)'
 
         found_etcd = 0 if resp == None else 1
         now = int(time.time())
@@ -124,7 +130,7 @@ for ip_addr in ips:
         # store the result in the DB
         cursor.execute('INSERT INTO etcdscan VALUES (?, ?, ?, ?, ?)', (ip, port, resp, found_etcd, now, ))
     else:
-        print 'already scanned ' + ip
+        print 'already scanned ' + ip + ' (' + "{0:.2f}".format((float(ips_scanned)/float(ip_count)) * 100) + '%)'
 
 
 # commit db changes and close
