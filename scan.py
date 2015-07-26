@@ -68,11 +68,14 @@ ip_count = len(ips)
 ips_scanned = 0
 
 
-# etcd 0.4.8 has a different version string, we normalize here
+# etcd 0.4.8 and 2.1 have a different version string, we normalize here
 def filter_for_etcd_048(resp):
     if 'releaseVersion' in resp:
         parsed_json = json.loads(resp)
         return 'etcd ' + parsed_json['releaseVersion']
+    elif 'etcdserver' in resp:
+        parsed_json = json.loads(resp)
+        return 'etcd ' + parsed_json['etcdserver']
     elif 'etcd' in resp:
         return resp
     else:
